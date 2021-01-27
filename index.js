@@ -178,13 +178,23 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
   /* Select field query, By default its undefined */
   const selectQuery = dollarQuery.$select;
 
-  const options = {
+  /* Create option object */
+  let options = {};
+
+  /* Create Populate according to its value */
+  let populate = dollarQuery.$populate;
+  if (populate) {
+   populate = populate.split(',');
+   options = _.assign(options, { populate });
+  }
+
+  options = _.assign(options, {
    select: selectQuery,
    lean: true,
    offset: skip,
    limit: limit,
    sort: sort,
-  };
+  });
 
   return { where, options };
  } catch (err) {

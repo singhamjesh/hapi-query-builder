@@ -26,9 +26,15 @@
   "engines": {
     "node": ">=12.20.1"
   },
+  "peerDependencies": {
+    "@hapi/hapi": ">=17.x.x"
+  },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "joi": "^17.3.0",
     "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "@hapi/hapi": "19.x.x"
   }
 }
