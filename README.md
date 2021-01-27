@@ -10,7 +10,7 @@ You can add the module to your Hapi using npm:
 ```
 
 ## Compatibility
-"node": ">=12.20.1"
+"node": ">=12.20.1",
 "@hapi/hapi": ">=18.x.x"
 
 
