@@ -13,13 +13,13 @@
     "hapi-mongoose",
     "hapi-mongoose-query"
   ],
-  "homepage": "https://github.com/p-meier/hapi-api-version#readme",
+  "homepage": "https://github.com/singhamjesh/hapi-query-builder#readme",
   "bugs": {
-    "url": "https://github.com/p-meier/hapi-api-version/issues"
+    "url": "https://github.com/singhamjesh/hapi-query-builder/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/p-meier/hapi-api-version.git"
+    "url": "git+https://github.com/singhamjesh/hapi-query-builder.git"
   },
   "author": "amjesh",
   "license": "ISC",
