@@ -6,7 +6,7 @@ The hapi-query-builder hapi.js to get all query from url and create mongoose que
 You can add the module to your Hapi using npm:
 
 ```bash
-> npm i hapi-query-builder --save
+ npm i hapi-query-builder --save
 ```
 
 ## Compatibility
@@ -53,6 +53,10 @@ const Hapi = require('@hapi/hapi');
     }
 })();
 ```
+
+## Documentation
+
+
 ## Thanks
 
 I would like to thank all of you.

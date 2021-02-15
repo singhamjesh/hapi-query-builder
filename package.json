@@ -1,10 +1,14 @@
 {
   "name": "hapi-query-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The hapi-query-builder hapi.js to get all query from url and create mongoose query.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "npm run format && npm run lint",
+    "format": "prettier --write \"**/*.+(js|yml|yaml|json)\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [
     "hapi",
@@ -35,6 +39,10 @@
     "lodash": "^4.17.20"
   },
   "devDependencies": {
-    "@hapi/hapi": "19.x.x"
+    "@hapi/hapi": "19.x.x",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "2.2.1"
   }
 }
