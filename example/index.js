@@ -15,9 +15,7 @@ const init = async function () {
       path: '/query',
       handler: function (request, h) {
         // Return the mongoose query which was requested in query params
-        return {
-          query: request.parsedQuery,
-        };
+        return request.parsedQuery;
       },
     });
 
