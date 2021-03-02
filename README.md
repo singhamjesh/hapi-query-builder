@@ -1,5 +1,5 @@
 # Universal query builder for Hapi.js
-Hapi-query-builder is an Hapi.js  plugin. It ambitious attempt to create a kind of "URL" to "Mongoose query" translator which provides a mongoose query for GET API. It provides facilities to the developer to pass query params in URL and get the mongoose query. 
+Hapi-query-builder is a Hapi.js  plugin. It is an ambitious attempt to create a kind of "URL" to "Mongoose query" translator which provides a mongoose query for GET API. It provides facilities to the developer to pass query params in URL and get the mongoose query. 
 
 #### The primary benefits of this plugin (currently) are:    
  * Ability to convert directory query params to mongoose get query.
