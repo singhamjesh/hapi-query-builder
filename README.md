@@ -146,8 +146,8 @@ You defaultLimit must be pass in plugin option
 ```
 
 ### Version
-You can also pass v1 and v2 for hapi-query-bulder version                               
-If you not pass v1 or v2 in query params it's by default use version 1                             
+You can also pass v1 and v2 for hapi-query-builder version                               
+If you do not pass v1 or v2 in query params it's by default use version 1                             
 ```
 * /api-path?v=value
 * Ex- /user?$v=2

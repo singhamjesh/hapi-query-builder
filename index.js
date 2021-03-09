@@ -241,3 +241,17 @@ exports.register = (server, options) => {
     return h.continue;
   });
 };
+
+/**
+ * This method trigger manually when user call
+ * Its a helper method. to use this you can get query from another REST method also
+ * @param {Hapi request obj} requestQuery request query object
+ * @param { Number } defaultLimit default record limit
+ * @return {where, options} in object
+ */
+exports.QueryMaker = async (requestQuery, defaultLimit = 100) => {
+  if (!requestQuery || !defaultLimit) {
+    throw new Error('Invalid request parameters');
+  }
+  return await _hapiQueryBuilderHandler(requestQuery, defaultLimit);
+};
