@@ -84,39 +84,43 @@ You can get mongoose query in handler in hapi.js
 
 ## Documentation
 ### Where    
-Passing DB field name and match value without dollar symbol   
+Passing DB field name (Get all record where field match with value)   
 ```     
-* /api-path?field1=value&field2=value&.....fieldn=value   
-* Ex- /user?_id=5ff48a66070a2466418e6adc&email=example@email.com 
-
+- GET       /api-path?field1=value&field2=value&.....fieldn=value   
+- Ex        /user?_id=5ff48a66070a2466418e6adc&email=example@email.com 
+- Result    {"where":{"_id":"5ff48a66070a2466418e6adc","email":"example@email.com"},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ``` 
 
 ### Select field value
 Passing DB field name with space in $select    
 ```    
-* /api-path?$select=field1 field2 field3..... fieldn        
-* Ex- /user?$select=_id email title name        
+- GET       /api-path?$select=field1 field2 field3..... fieldn        
+- Ex        /user?$select=_id email title name  
+- Result    {"where":{},"options":{"select":"_id email title name","lean":true,"offset":0,"limit":20,"sort":{}}}
 ````   
 
 ### Search with case sensitive    
 Passing DB field name and search value with pip operator in $search     
 ```
-* /api-path?$search=field|value
-* Ex- /user?$search=name|mohan
+- GET       /api-path?$search=field|value
+- Ex        /user?$search=name|Amjesh
+- Result    {"where":{"name":{"$regex":/Amjesh/}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
 ### Search without case sensitive
 Passing DB field name and search value with pip operator in $isearch 
 ```
-* /api-path?$isearch=field|value
-* Ex- /user?$isearch=name|Mohan
+- GET       /api-path?$isearch=field|value
+- Ex-       /user?$isearch=name|Amjesh
+- Result    {"where":{"name":{"$regex":/amjesh/,"$options":"i"}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
 ### Populate
 Passing modal with comma separated in $populate    
 ```
-* /api-path?$populate=modal1,modal2,....modaln
-* Ex- /user?$populate=post,comment
+- GET       /api-path?$populate=modal1,modal2,....modaln
+- Ex        /user?$populate=post,comment
+- Result    {"where":{},"options":{"populate":["post","comment"],"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
 ### Sort
@@ -124,25 +128,62 @@ Passing DB field name for shorting in $sort
 _For Ascending pass value 1 or_             
 _For Descending pass value -1_     
 ```   
-* /api-path?$sort=field|1 or    
-* /api-path?$sort=field|-1    
-* Ex- /user?$sort=updatedAt|1 or    
-* Ex- /user?$sort=updatedAt|-1    
+- GET       /api-path?$sort=field|1  
+- Ex        /user?$sort=updatedAt|1
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"1"}}}
+            OR    
+- GET       /api-path?$sort=field|-1    
+- Ex        /user?$sort=updatedAt|-1  
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1"}}}     
 ```   
 
 ### Skip
 Skip record for pagination in $skip(By default it's 0)   
 ```
-* /api-path?$skip=value
-* Ex- /user?$skip=1
+- GET       /api-path?$skip=value
+- Ex        /user?$skip=1
+- Result    {"where":{},"options":{"lean":true,"offset":1,"limit":20,"sort":{}}}
 ```
 
 ### Limit
 Passing limit for total number of record for pagination in $limit.                            
-You defaultLimit must be pass in plugin option                    
+You defaultLimit must be pass in plugin option                   
 ```
-* /api-path?$limit=value
-* Ex- /user?$limit=100
+- GET       /api-path?$limit=value
+- Ex        /user?$limit=100
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":100,"sort":{}}}
+```
+
+### IN or NOT IN
+Get all records where the value does $in(In) or does not $nin(Not-in) match from values                                  
+```
+- GET       /api-path?field[$in]=value1,value2.....valuen
+- Ex        /user?id[$in]=10,11,12,13,14
+- Result    {"where":{"id":{"$in":["10","11","12","13","14"]}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
+```
+
+### GT Or GTE
+Get all records where the value does $gt(Greater then) or does not $gte(Greater then equal to) match from value                 
+```
+- GET       /api-path?field[$gt]=value
+- Ex        /user?comment[$gt]=100
+- Result    {"where":{"comment":{"$gt":"100"}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
+```
+
+### LT or LTE
+Get all records where the value does $lt(Less then) or does not $lte(Less then equal to) match from value                                              
+```
+- GET       /api-path?field[$lt]=value
+- Ex        /user?likes[$lt]=100
+- Result    {"where":{"likes":{"$lt":"100"}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
+```
+
+### NE
+Get all records where the value does $ne(not equal to) match from value                  
+```
+- GET       /api-path?field[$ne]=value
+- Ex        /user?archive[$ne]=true
+- Result    {"where":{"archive":{"$ne":true}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
 ### Version

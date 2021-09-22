@@ -1,118 +1,19 @@
 const Joi = require('joi');
 const Boom = require('@hapi/boom');
-const _ = require('lodash');
+const { assign } = require('lodash');
 const Package = require('./package');
+const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
+const { searchQueryHandler } = require('./lib/search');
+const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
+const { gtOrGteQueryBuilder } = require('./lib/gtOrGte');
+const { ltOrLteQueryBuilder } = require('./lib/ltOrLte');
+const { neQueryBuilder } = require('./lib/ne');
 
 /* Validate query builder options with given schema */
 const schema = {
   optionsSchema: Joi.object({
     defaultLimit: Joi.number().integer().default(50),
   }),
-};
-
-/**
- * Remove spacial character from query text value
- * @param {*} text query text
- * @return {*} text
- */
-const _formatSpecialChar = async (text) => {
-  try {
-    text = text.replace('+', '\\+');
-    text = text.replace('-', '\\-');
-    return text;
-  } catch (err) {
-    throw new Boom.Boom(err, { statusCode: 400 });
-  }
-};
-
-/**
- * Create search query according to query params
- * @param {*} text
- */
-const _searchQueryHandler = async (dollarQuery) => {
-  const where = {};
-
-  /* Filter $search from query */
-  const searchQuery = _.pickBy(dollarQuery, function (value, key) {
-    return key === '$search';
-  });
-
-  /* Create Search query params with case sensitive for and condition */
-  if (dollarQuery.$search) {
-    if (_.isArray(searchQuery.$search)) {
-      searchQuery.$search.forEach(async (ele) => {
-        const search = ele.split('|');
-        const text = await _formatSpecialChar(search[1]);
-        where[search[0]] = {
-          $regex: new RegExp(text),
-        };
-      });
-    } else {
-      const search = searchQuery.$search.split('|');
-      const text = await _formatSpecialChar(search[1]);
-      where[search[0]] = {
-        $regex: new RegExp(text),
-      };
-    }
-  }
-
-  /* Filter $isearch from query */
-  const isearchQuery = _.pickBy(dollarQuery, function (value, key) {
-    return key === '$isearch';
-  });
-
-  /* Create Search query params without case sensitive for and condition */
-  if (dollarQuery.$isearch) {
-    if (_.isArray(isearchQuery.$isearch)) {
-      isearchQuery.$isearch.forEach(async (ele) => {
-        const isearch = ele.split('|');
-        const text = await _formatSpecialChar(isearch[1]);
-        where[isearch[0]] = {
-          $regex: new RegExp(text),
-          $options: 'i',
-        };
-      });
-    } else {
-      const isearch = isearchQuery.$isearch.split('|');
-      const text = await _formatSpecialChar(isearch[1]);
-      where[isearch[0]] = {
-        $regex: new RegExp(text),
-        $options: 'i',
-      };
-    }
-  }
-
-  /* Create Search query params without case sensitive for or condition */
-  if (dollarQuery.$searchOr) {
-    const orSearch = dollarQuery.$searchOr.split('|');
-    const fields = orSearch[0].split(',');
-    const text = await _formatSpecialChar(orSearch[1]);
-    const orQuery = [];
-    fields.forEach((ele) => {
-      const q = {};
-      q[ele] = { $regex: new RegExp(text) };
-      orQuery.push(q);
-    });
-
-    where.$or = orQuery;
-  }
-
-  /* Create Search query params with case sensitive for or condition */
-  if (dollarQuery.$isearchOr) {
-    const iorSearch = dollarQuery.$isearchOr.split('|');
-    const fields = iorSearch[0].split(',');
-    const text = await _formatSpecialChar(iorSearch[1]);
-    const iorQuery = [];
-    fields.forEach((ele) => {
-      const q = {};
-      q[ele] = { $regex: new RegExp(text), $options: 'i' };
-      iorQuery.push(q);
-    });
-
-    where.$or = iorQuery;
-  }
-
-  return where;
 };
 
 /**
@@ -133,21 +34,27 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     delete requestQuery.v;
 
     /* Filter dollar query option in request query */
-    const dollarQuery = _.pickBy(requestQuery, function (value, key) {
-      return _.startsWith(key, '$');
-    });
+    const dollarQuery = await filterByStartsWith(requestQuery, '$');
 
     /* Remove dollar query from request query */
-    Object.keys(dollarQuery).forEach((ele) => {
-      delete requestQuery[ele];
-    });
+    await removeElements(dollarQuery, requestQuery);
+
+    /* Create $in or $nin mongoose query */
+    const inOrNotInQuery = await inOrNotInQueryBuilder(requestQuery);
+
+    /* Create $gt(Greater then) or $gte(Greater then equal to) mongoose query */
+    const gtOrGteQuery = await gtOrGteQueryBuilder(requestQuery);
+
+    /* Create $lt(Less then) or $lte(Less then equal to) mongoose query */
+    const ltOrLteQuery = await ltOrLteQueryBuilder(requestQuery);
+
+    /* Create $ne(not equal to) mongoose query */
+    const neQuery = await neQueryBuilder(requestQuery);
 
     /* Filter dollar operator form request query object */
-    const operatorQuery = _.pickBy(requestQuery, function (value, key) {
-      return _.startsWith(value, '$');
-    });
+    const operatorQuery = await filterByStartsWith(requestQuery, '$', false);
 
-    /*  Create condition with query operation operator  and delete objQuery key */
+    /*  Create condition with query operation operator and delete objQuery key */
     Object.keys(operatorQuery).forEach((ele) => {
       delete requestQuery[ele];
       const opKey = operatorQuery[ele].split('|')[0];
@@ -156,12 +63,16 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       operatorQuery[ele][opKey] = opVal;
     });
 
-    const searchQuery = await _searchQueryHandler(dollarQuery);
+    const searchQuery = await searchQueryHandler(dollarQuery);
 
     const where = {
       ...requestQuery,
       ...operatorQuery,
       ...searchQuery,
+      ...inOrNotInQuery,
+      ...gtOrGteQuery,
+      ...ltOrLteQuery,
+      ...neQuery,
     };
 
     /* Get limit from request query either env variable */
@@ -192,10 +103,10 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     let populate = dollarQuery.$populate;
     if (populate) {
       populate = populate.split(',');
-      options = _.assign(options, { populate });
+      options = assign(options, { populate });
     }
 
-    options = _.assign(options, {
+    options = assign(options, {
       select: selectQuery,
       lean: true,
       offset: skip,
