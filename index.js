@@ -86,8 +86,11 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     /* Prepare Sort query for mongodb from request query */
     const sort = {};
     if (dollarQuery.$sort) {
-      const key = dollarQuery.$sort.split('|')[0];
-      sort[key] = dollarQuery.$sort.split('|')[1];
+      const sortArray = dollarQuery.$sort.split(',');
+      sortArray.forEach((item) => {
+        const key = item.split('|')[0];
+        sort[key] = item.split('|')[1];
+      });
     }
 
     /* Select field query, By default its undefined */

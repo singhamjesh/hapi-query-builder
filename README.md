@@ -128,13 +128,13 @@ Passing DB field name for shorting in $sort
 _For Ascending pass value 1 or_             
 _For Descending pass value -1_     
 ```   
-- GET       /api-path?$sort=field|1  
-- Ex        /user?$sort=updatedAt|1
-- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"1"}}}
+- GET       /api-path?$sort=field1|1,field2|1 
+- Ex        /user?$sort=updatedAt|1,_id|1
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"1","_id":"1"}}}
             OR    
-- GET       /api-path?$sort=field|-1    
-- Ex        /user?$sort=updatedAt|-1  
-- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1"}}}     
+- GET       /api-path?$sort=field1|-1,field2|-1     
+- Ex        /user?$sort=updatedAt|-1,_id|-1 
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1","_id":"-1"}}}     
 ```   
 
 ### Skip
@@ -194,7 +194,5 @@ If you do not pass v1 or v2 in query params it's by default use version 1
 * Ex- /user?$v=2
 ```
 
-## Thanks
 
-I would like to thank all of you.
 
