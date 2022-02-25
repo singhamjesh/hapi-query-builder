@@ -100,7 +100,10 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     }
 
     /* Create option object */
-    let options = {};
+    let options = {
+      select: selectQuery,
+      sort: sort,
+    };
 
     /* Create Populate according to its value */
     let populate = dollarQuery.$populate;
@@ -110,8 +113,6 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     }
 
     options = assign(options, {
-      select: selectQuery,
-      sort: sort,
       lean: true,
       offset: skip,
       limit: limit,
