@@ -111,10 +111,10 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
 
     options = assign(options, {
       select: selectQuery,
+      sort: sort,
       lean: true,
       offset: skip,
       limit: limit,
-      sort: sort,
     });
 
     return { where, options };
