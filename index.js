@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const Boom = require('@hapi/boom');
 const { assign } = require('lodash');
+const Mongoose = require('mongoose');
 const Package = require('./package');
 const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
 const { searchQueryHandler } = require('./lib/search');
@@ -60,10 +61,20 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       const opKey = operatorQuery[ele].split('|')[0];
       const opVal = operatorQuery[ele].split('|')[1];
       operatorQuery[ele] = {};
-      operatorQuery[ele][opKey] = opVal;
+      if (Mongoose.Types.ObjectId.isValid(item)) {
+        operatorQuery[ele][opKey] = Mongoose.Types.ObjectId(opVal);
+      } else {
+        operatorQuery[ele][opKey] = opVal;
+      }
     });
 
     const searchQuery = await searchQueryHandler(dollarQuery);
+
+    for (const item in requestQuery) {
+      if (Mongoose.Types.ObjectId.isValid(requestQuery[item])) {
+        requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
+      }
+    }
 
     const where = {
       ...requestQuery,

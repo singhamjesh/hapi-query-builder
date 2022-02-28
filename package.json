@@ -36,7 +36,8 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "joi": "^17.3.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "mongoose": "^6.2.3"
   },
   "devDependencies": {
     "@hapi/hapi": "19.x.x",
