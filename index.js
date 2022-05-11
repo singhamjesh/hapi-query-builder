@@ -3,6 +3,7 @@ const Boom = require('@hapi/boom');
 const { assign } = require('lodash');
 const Mongoose = require('mongoose');
 const Package = require('./package');
+const { strToNumber } = require('./lib/helper');
 const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
 const { searchQueryHandler } = require('./lib/search');
 const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
@@ -64,7 +65,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       if (Mongoose.Types.ObjectId.isValid(item)) {
         operatorQuery[ele][opKey] = Mongoose.Types.ObjectId(opVal);
       } else {
-        operatorQuery[ele][opKey] = opVal;
+        operatorQuery[ele][opKey] = strToNumber(opVal);
       }
     });
 
@@ -73,6 +74,8 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     for (const item in requestQuery) {
       if (Mongoose.Types.ObjectId.isValid(requestQuery[item])) {
         requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
+      } else {
+        requestQuery[item] = strToNumber(requestQuery[item]);
       }
     }
 
