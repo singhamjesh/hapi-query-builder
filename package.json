@@ -1,5 +1,5 @@
 {
-  "name": "hapi-query-builder",
+  "name": "@amjesh/hapi-query-builder",
   "version": "1.5.0",
   "description": "The hapi-query-builder hapi.js to get all query from url and create mongoose query.",
   "main": "index.js",
@@ -45,5 +45,9 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
     "prettier": "2.2.1"
+  },
+  "directories": {
+    "example": "example",
+    "lib": "lib"
   }
 }
