@@ -72,7 +72,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     const searchQuery = await searchQueryHandler(dollarQuery);
 
     for (const item in requestQuery) {
-      if (Mongoose.Types.ObjectId.isValid(requestQuery[item])) {
+      if (Mongoose.Types.ObjectId.isValid(requestQuery[item]) && requestQuery[item].length === 24) {
         requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
       } else {
         requestQuery[item] = strToNumber(requestQuery[item]);
