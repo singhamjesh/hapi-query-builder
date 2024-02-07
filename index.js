@@ -64,6 +64,8 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       operatorQuery[ele] = {};
       if (Mongoose.Types.ObjectId.isValid(item)) {
         operatorQuery[ele][opKey] = Mongoose.Types.ObjectId(opVal);
+      } else if(item ==='true' || item === 'false'){
+        operatorQuery[ele][opKey] = opVal === 'true';
       } else {
         operatorQuery[ele][opKey] = strToNumber(opVal);
       }
@@ -74,6 +76,8 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     for (const item in requestQuery) {
       if (Mongoose.Types.ObjectId.isValid(requestQuery[item]) && requestQuery[item].length === 24) {
         requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
+      } else if(requestQuery[item] === 'true' || requestQuery[item] === 'false'){
+        requestQuery[item] = requestQuery[item] === 'true';
       } else {
         requestQuery[item] = strToNumber(requestQuery[item]);
       }
