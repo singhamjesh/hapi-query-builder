@@ -1,13 +1,18 @@
 # Universal query builder for Hapi.js
-Hapi-query-builder is a Hapi.js  plugin. It is an ambitious attempt to create a kind of "URL" to "Mongoose query" translator which provides a mongoose query for GET API. It provides facilities to the developer to pass query params in URL and get the mongoose query. 
 
-#### The primary benefits of this plugin (currently) are:    
- * Ability to convert directory query params to mongoose get query.
- * Supports all get query command of mongoose (like- pagination and populate)
- * Automatically identify where condition and option from query params.
- * You can access mongoose query in request parameter with name "parsedQuery". It is object witch hold where and option keys.
- * For better experience use "mongoose-paginate-v2" npm package.
+Hapi-query-builder is a Hapi.js plugin. It is an ambitious attempt to create a
+kind of "URL" to "Mongoose query" translator which provides a mongoose query for
+GET API. It provides facilities to the developer to pass query params in URL and
+get the mongoose query.
 
+#### The primary benefits of this plugin (currently) are:
+
+- Ability to convert directory query params to mongoose get query.
+- Supports all get query command of mongoose (like- pagination and populate)
+- Automatically identify where condition and option from query params.
+- You can access mongoose query in request parameter with name "parsedQuery". It
+  is object witch hold where and option keys.
+- For better experience use "mongoose-paginate-v2" npm package.
 
 ## Installation
 
@@ -18,13 +23,14 @@ You can add the module to your Hapi using npm:
 ```
 
 ## Compatibility
+
 node: >= 12.20.1,  
 hapi: >= 18.x.x
 
-
 ## Quick start
 
-In your Hapi apps `server` object simply add `hapi-query-builder` and also add the routes for your API as described on the hapijs.com site.
+In your Hapi apps `server` object simply add `hapi-query-builder` and also add
+the routes for your API as described on the hapijs.com site.
 
 ```Javascript
 const Hapi = require('@hapi/hapi');
@@ -62,7 +68,8 @@ const Hapi = require('@hapi/hapi');
 })();
 ```
 
-### Example 
+### Example
+
 You just pass query in query params form Front-end in request.
 
 ```
@@ -70,10 +77,12 @@ const axios = require('axios');
 
 const response = axios.get('/user?email=example@email.com&$limit=10&$skip=1&$sort=updatedAt|-1');
 ```
+
 You can get mongoose query in handler in hapi.js
+
 ```
  handler: function (request, h) {
-   query: request.parsedQuery,          
+   query: request.parsedQuery,
  };
 
 
@@ -83,24 +92,41 @@ You can get mongoose query in handler in hapi.js
 ```
 
 ## Documentation
-### Where    
-Passing DB field name (Get all record where field match with value)   
-```     
-- GET       /api-path?field1=value&field2=value&.....fieldn=value   
-- Ex        /user?_id=5ff48a66070a2466418e6adc&email=example@email.com 
+
+### Where
+
+Passing DB field name (Get all record where field match with value)
+
+```
+- GET       /api-path?field1=value&field2=value&.....fieldn=value
+- Ex        /user?_id=5ff48a66070a2466418e6adc&email=example@email.com
 - Result    {"where":{"_id":"5ff48a66070a2466418e6adc","email":"example@email.com"},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
-``` 
+```
+
+### Or operator
+
+Passing DB field name ($or condition for mongodb)
+
+```
+- GET       /api-path?$or=field1|value,field2|value,.....,fieldn|value
+- Ex        /user?$or=_id|5ff48a66070a2466418e6adc,email|example@email.com
+- Result    {"where":{"$or":[{"_id":"5ff48a66070a2466418e6adc"},{"email":"example@email.com"}],"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
+```
 
 ### Select field value
-Passing DB field name with space in $select    
-```    
-- GET       /api-path?$select=field1 field2 field3..... fieldn        
-- Ex        /user?$select=_id email title name  
-- Result    {"where":{},"options":{"select":"_id email title name","lean":true,"offset":0,"limit":20,"sort":{}}}
-````   
 
-### Search with case sensitive    
-Passing DB field name and search value with pip operator in $search     
+Passing DB field name with space in $select
+
+```
+- GET       /api-path?$select=field1 field2 field3..... fieldn
+- Ex        /user?$select=_id email title name
+- Result    {"where":{},"options":{"select":"_id email title name","lean":true,"offset":0,"limit":20,"sort":{}}}
+```
+
+### Search with case sensitive
+
+Passing DB field name and search value with pip operator in $search
+
 ```
 - GET       /api-path?$search=field|value
 - Ex        /user?$search=name|Amjesh
@@ -108,7 +134,9 @@ Passing DB field name and search value with pip operator in $search
 ```
 
 ### Search without case sensitive
-Passing DB field name and search value with pip operator in $isearch 
+
+Passing DB field name and search value with pip operator in $isearch
+
 ```
 - GET       /api-path?$isearch=field|value
 - Ex-       /user?$isearch=name|Amjesh
@@ -116,7 +144,9 @@ Passing DB field name and search value with pip operator in $isearch
 ```
 
 ### Populate
-Passing modal with comma separated in $populate    
+
+Passing modal with comma separated in $populate
+
 ```
 - GET       /api-path?$populate=modal1,modal2,....modaln
 - Ex        /user?$populate=post,comment
@@ -124,21 +154,25 @@ Passing modal with comma separated in $populate
 ```
 
 ### Sort
-Passing DB field name for shorting in $sort     
-_For Ascending pass value 1 or_             
-_For Descending pass value -1_     
-```   
-- GET       /api-path?$sort=field1|1,field2|1 
+
+Passing DB field name for shorting in $sort  
+_For Ascending pass value 1 or_  
+_For Descending pass value -1_
+
+```
+- GET       /api-path?$sort=field1|1,field2|1
 - Ex        /user?$sort=updatedAt|1,_id|1
 - Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"1","_id":"1"}}}
-            OR    
-- GET       /api-path?$sort=field1|-1,field2|-1     
-- Ex        /user?$sort=updatedAt|-1,_id|-1 
-- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1","_id":"-1"}}}     
-```   
+            OR
+- GET       /api-path?$sort=field1|-1,field2|-1
+- Ex        /user?$sort=updatedAt|-1,_id|-1
+- Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1","_id":"-1"}}}
+```
 
 ### Skip
-Skip record for pagination in $skip(By default it's 0)   
+
+Skip record for pagination in $skip(By default it's 0)
+
 ```
 - GET       /api-path?$skip=value
 - Ex        /user?$skip=1
@@ -146,8 +180,10 @@ Skip record for pagination in $skip(By default it's 0)
 ```
 
 ### Limit
-Passing limit for total number of record for pagination in $limit.                            
-You defaultLimit must be pass in plugin option                   
+
+Passing limit for total number of record for pagination in $limit.  
+You defaultLimit must be pass in plugin option
+
 ```
 - GET       /api-path?$limit=value
 - Ex        /user?$limit=100
@@ -155,7 +191,10 @@ You defaultLimit must be pass in plugin option
 ```
 
 ### IN or NOT IN
-Get all records where the value does $in(In) or does not $nin(Not-in) match from values                                  
+
+Get all records where the value does $in(In) or does not $nin(Not-in) match from
+values
+
 ```
 - GET       /api-path?field[$in]=value1,value2.....valuen
 - Ex        /user?id[$in]=10,11,12,13,14
@@ -163,7 +202,10 @@ Get all records where the value does $in(In) or does not $nin(Not-in) match from
 ```
 
 ### GT Or GTE
-Get all records where the value does $gt(Greater then) or does not $gte(Greater then equal to) match from value                 
+
+Get all records where the value does $gt(Greater then) or does not $gte(Greater
+then equal to) match from value
+
 ```
 - GET       /api-path?field[$gt]=value
 - Ex        /user?comment[$gt]=100
@@ -171,7 +213,10 @@ Get all records where the value does $gt(Greater then) or does not $gte(Greater 
 ```
 
 ### LT or LTE
-Get all records where the value does $lt(Less then) or does not $lte(Less then equal to) match from value                                              
+
+Get all records where the value does $lt(Less then) or does not $lte(Less then
+equal to) match from value
+
 ```
 - GET       /api-path?field[$lt]=value
 - Ex        /user?likes[$lt]=100
@@ -179,7 +224,9 @@ Get all records where the value does $lt(Less then) or does not $lte(Less then e
 ```
 
 ### NE
-Get all records where the value does $ne(not equal to) match from value                  
+
+Get all records where the value does $ne(not equal to) match from value
+
 ```
 - GET       /api-path?field[$ne]=value
 - Ex        /user?archive[$ne]=true
@@ -187,12 +234,11 @@ Get all records where the value does $ne(not equal to) match from value
 ```
 
 ### Version
-You can also pass v1 and v2 for hapi-query-builder version                               
-If you do not pass v1 or v2 in query params it's by default use version 1                             
+
+You can also pass v1 and v2 for hapi-query-builder version  
+If you do not pass v1 or v2 in query params it's by default use version 1
+
 ```
 * /api-path?v=value
 * Ex- /user?$v=2
 ```
-
-
-
