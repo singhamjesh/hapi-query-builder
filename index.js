@@ -10,6 +10,7 @@ const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
 const { gtOrGteQueryBuilder } = require('./lib/gtOrGte');
 const { ltOrLteQueryBuilder } = require('./lib/ltOrLte');
 const { neQueryBuilder } = require('./lib/ne');
+const { orQueryHandler } = require('./lib/orQuery');
 
 /* Validate query builder options with given schema */
 const schema = {
@@ -64,7 +65,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       operatorQuery[ele] = {};
       if (Mongoose.Types.ObjectId.isValid(item)) {
         operatorQuery[ele][opKey] = Mongoose.Types.ObjectId(opVal);
-      } else if(item ==='true' || item === 'false'){
+      } else if (item === 'true' || item === 'false') {
         operatorQuery[ele][opKey] = opVal === 'true';
       } else {
         operatorQuery[ele][opKey] = strToNumber(opVal);
@@ -74,14 +75,23 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     const searchQuery = await searchQueryHandler(dollarQuery);
 
     for (const item in requestQuery) {
-      if (Mongoose.Types.ObjectId.isValid(requestQuery[item]) && requestQuery[item].length === 24) {
+      if (
+        Mongoose.Types.ObjectId.isValid(requestQuery[item]) &&
+        requestQuery[item].length === 24
+      ) {
         requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
-      } else if(requestQuery[item] === 'true' || requestQuery[item] === 'false'){
+      } else if (
+        requestQuery[item] === 'true' ||
+        requestQuery[item] === 'false'
+      ) {
         requestQuery[item] = requestQuery[item] === 'true';
       } else {
         requestQuery[item] = strToNumber(requestQuery[item]);
       }
     }
+
+    /* Filter OR operator */
+    const orQuery = await orQueryHandler(dollarQuery);
 
     const where = {
       ...requestQuery,
@@ -91,6 +101,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       ...gtOrGteQuery,
       ...ltOrLteQuery,
       ...neQuery,
+      ...orQuery,
     };
 
     /* Get limit from request query either env variable */

@@ -2,7 +2,7 @@ const Hapi = require('@hapi/hapi');
 
 const init = async function () {
   try {
-    const server = new Hapi.server({ port: 5000 });
+    const server = new Hapi.server({ port: 5001 });
     await server.register({
       plugin: require('../index'),
       options: {
@@ -15,7 +15,13 @@ const init = async function () {
       path: '/query',
       handler: function (request, h) {
         // Return the mongoose query which was requested in query params
-        return request.parsedQuery;
+        return h
+          .response({
+            statusCode: 200,
+            message: `See query in response data`,
+            data: request.parsedQuery,
+          })
+          .code(200);
       },
     });
 
