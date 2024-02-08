@@ -1,6 +1,6 @@
 {
   "name": "hapi-query-builder",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "The hapi-query-builder hapi.js to get all query from url and create mongoose query.",
   "main": "index.js",
   "scripts": {
