@@ -169,7 +169,7 @@ _For Descending pass value -1_
 - Result    {"where":{},"options":{"lean":true,"offset":0,"limit":20,"sort":{"updatedAt":"-1","_id":"-1"}}}
 ```
 
-### Skip
+### Skip(optional)
 
 Skip record for pagination in $skip(By default it's 0)
 
@@ -179,10 +179,10 @@ Skip record for pagination in $skip(By default it's 0)
 - Result    {"where":{},"options":{"lean":true,"offset":1,"limit":20,"sort":{}}}
 ```
 
-### Limit
+### Limit(optional)
 
 Passing limit for total number of record for pagination in $limit.  
-You defaultLimit must be pass in plugin option
+You can pass defaultLimit in plugin option
 
 ```
 - GET       /api-path?$limit=value

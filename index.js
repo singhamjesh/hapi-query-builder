@@ -25,7 +25,7 @@ const schema = {
  * @return {*} where object
  * @return {*} option object
  */
-const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
+const _hapiQueryBuilderHandler = async (requestQuery) => {
   try {
     /* Hack due to bug in hapi-swagger-docs */
     delete requestQuery[''];
@@ -104,13 +104,17 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       ...orQuery,
     };
 
+    let options = { lean: true };
+
     /* Get limit from request query either env variable */
-    const limit = dollarQuery.$limit
-      ? parseInt(dollarQuery.$limit)
-      : parseInt(defaultLimit);
+    if (dollarQuery.$limit) {
+      options = assign(options, { limit: parseInt(dollarQuery.$limit) });
+    }
 
     /* Get skip from request query either it set 0 */
-    const skip = dollarQuery.$skip ? parseInt(dollarQuery.$skip) : 0;
+    if (dollarQuery.$skip) {
+      options = assign(options, { offset: parseInt(dollarQuery.$skip) });
+    }
 
     /* Prepare Sort query for mongodb from request query */
     const sort = {};
@@ -120,6 +124,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
         const key = item.split('|')[0];
         sort[key] = item.split('|')[1];
       });
+      options = assign(options, { sort });
     }
 
     /* Select field query, By default its undefined */
@@ -127,12 +132,7 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
     if (!selectQuery && version == 2) {
       selectQuery = '_id';
     }
-
-    /* Create option object */
-    let options = {
-      select: selectQuery,
-      sort: sort,
-    };
+    options = assign(options, { select: selectQuery });
 
     /* Create Populate according to its value */
     let populate = dollarQuery.$populate;
@@ -140,12 +140,6 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultLimit) => {
       populate = populate.split(',');
       options = assign(options, { populate });
     }
-
-    options = assign(options, {
-      lean: true,
-      offset: skip,
-      limit: limit,
-    });
 
     return { where, options };
   } catch (err) {
@@ -179,7 +173,7 @@ exports.register = (server, options) => {
     if (request.method === 'get') {
       request.parsedQuery = await _hapiQueryBuilderHandler(
         request.query,
-        options.defaultLimit,
+        // options.defaultLimit,
       );
     }
     return h.continue;
@@ -197,5 +191,5 @@ exports.QueryMaker = async (requestQuery, defaultLimit = 100) => {
   if (!requestQuery || !defaultLimit) {
     throw new Error('Invalid request parameters');
   }
-  return await _hapiQueryBuilderHandler(requestQuery, defaultLimit);
+  return await _hapiQueryBuilderHandler(requestQuery);
 };
