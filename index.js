@@ -3,14 +3,18 @@ const Boom = require('@hapi/boom');
 const { assign } = require('lodash');
 const Mongoose = require('mongoose');
 const Package = require('./package');
-const { strToNumber } = require('./lib/helper');
+const { strToNumber, handleOrInWhereObject } = require('./lib/helper');
 const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
-const { searchQueryHandler, searchInFieldsHandler } = require('./lib/search');
 const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
 const { gtOrGteQueryBuilder } = require('./lib/gtOrGte');
 const { ltOrLteQueryBuilder } = require('./lib/ltOrLte');
 const { neQueryBuilder } = require('./lib/ne');
 const { orQueryHandler } = require('./lib/orQuery');
+const {
+  searchQueryHandler,
+  isearchQueryHandler,
+  searchInFieldsHandler,
+} = require('./lib/search');
 
 /* Validate query builder options with given schema */
 const schema = {
@@ -72,8 +76,6 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
       }
     });
 
-    const searchQuery = await searchQueryHandler(dollarQuery);
-
     for (const item in requestQuery) {
       if (
         Mongoose.Types.ObjectId.isValid(requestQuery[item]) &&
@@ -90,25 +92,34 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
       }
     }
 
-    /* Filter OR operator */
-    const orQuery = await orQueryHandler(dollarQuery);
+    /* Default options for mongodb query */
+    let options = { lean: true };
 
-    /* Make mongodb fields search query */
-    const fieldSearchQuery = await searchInFieldsHandler(dollarQuery);
-
-    const where = {
+    /* Create where object */
+    let where = {
       ...requestQuery,
       ...operatorQuery,
-      ...searchQuery,
       ...inOrNotInQuery,
       ...gtOrGteQuery,
       ...ltOrLteQuery,
       ...neQuery,
-      ...orQuery,
-      ...fieldSearchQuery,
     };
 
-    let options = { lean: true };
+    /* Create search query with case sensitive */
+    const searchQuery = await searchQueryHandler(dollarQuery);
+    where = handleOrInWhereObject(where, searchQuery);
+
+    /* Create search query without case sensitive */
+    const isearchQuery = await isearchQueryHandler(dollarQuery);
+    where = handleOrInWhereObject(where, isearchQuery);
+
+    /* Filter OR operator */
+    const orQuery = await orQueryHandler(dollarQuery);
+    where = handleOrInWhereObject(where, orQuery);
+
+    /* Make mongodb fields search query */
+    const fieldSearchQuery = await searchInFieldsHandler(dollarQuery);
+    where = handleOrInWhereObject(where, fieldSearchQuery);
 
     /* Get limit from request query either env variable */
     if (dollarQuery.$limit) {
