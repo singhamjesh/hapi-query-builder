@@ -1,9 +1,8 @@
 const Joi = require('joi');
 const Boom = require('@hapi/boom');
 const { assign } = require('lodash');
-const Mongoose = require('mongoose');
 const Package = require('./package');
-const { strToNumber, handleOrInWhereObject } = require('./lib/helper');
+const { handleNumberType, handleOrInWhereObject } = require('./lib/helper');
 const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
 const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
 const { gtOrGteQueryBuilder } = require('./lib/gtOrGte');
@@ -66,30 +65,11 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
       delete requestQuery[ele];
       const opKey = operatorQuery[ele].split('|')[0];
       const opVal = operatorQuery[ele].split('|')[1];
-      operatorQuery[ele] = {};
-      if (Mongoose.Types.ObjectId.isValid(item)) {
-        operatorQuery[ele][opKey] = Mongoose.Types.ObjectId(opVal);
-      } else if (item === 'true' || item === 'false') {
-        operatorQuery[ele][opKey] = opVal === 'true';
-      } else {
-        operatorQuery[ele][opKey] = strToNumber(opVal);
-      }
+      operatorQuery[ele][opKey] = handleNumberType(opVal);
     });
 
     for (const item in requestQuery) {
-      if (
-        Mongoose.Types.ObjectId.isValid(requestQuery[item]) &&
-        requestQuery[item].length === 24
-      ) {
-        requestQuery[item] = Mongoose.Types.ObjectId(requestQuery[item]);
-      } else if (
-        requestQuery[item] === 'true' ||
-        requestQuery[item] === 'false'
-      ) {
-        requestQuery[item] = requestQuery[item] === 'true';
-      } else {
-        requestQuery[item] = strToNumber(requestQuery[item]);
-      }
+      requestQuery[item] = handleNumberType(requestQuery[item]);
     }
 
     /* Default options for mongodb query */
