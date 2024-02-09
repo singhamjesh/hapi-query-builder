@@ -123,6 +123,16 @@ Passing DB field name with space in $select
 - Result    {"where":{},"options":{"select":"_id email title name","lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
+### Search query($q) (in given fields)
+
+Passing search text with DB fields name with pip operator in $q
+
+```
+- GET       /api-path?$q=text|field1,field2....fieldn
+- Ex        /user?$q=amjesh|email,name
+- Result    {{"where":{"$or":[{"email":{"$regex":"amjesh","$options":"i"}},{"name":{"$regex":"amjesh","$options":"i"}}]},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
+```
+
 ### Search with case sensitive
 
 Passing DB field name and search value with pip operator in $search

@@ -5,7 +5,7 @@ const Mongoose = require('mongoose');
 const Package = require('./package');
 const { strToNumber } = require('./lib/helper');
 const { removeElements, filterByStartsWith } = require('./lib/filterStrings');
-const { searchQueryHandler } = require('./lib/search');
+const { searchQueryHandler, searchInFieldsHandler } = require('./lib/search');
 const { inOrNotInQueryBuilder } = require('./lib/inOrNotIn');
 const { gtOrGteQueryBuilder } = require('./lib/gtOrGte');
 const { ltOrLteQueryBuilder } = require('./lib/ltOrLte');
@@ -93,6 +93,9 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
     /* Filter OR operator */
     const orQuery = await orQueryHandler(dollarQuery);
 
+    /* Make mongodb fields search query */
+    const fieldSearchQuery = await searchInFieldsHandler(dollarQuery);
+
     const where = {
       ...requestQuery,
       ...operatorQuery,
@@ -102,6 +105,7 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
       ...ltOrLteQuery,
       ...neQuery,
       ...orQuery,
+      ...fieldSearchQuery,
     };
 
     let options = { lean: true };
