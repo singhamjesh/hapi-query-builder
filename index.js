@@ -75,6 +75,12 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
     /* Default options for mongodb query */
     let options = { lean: true };
 
+    /* Create search query with case sensitive */
+    const searchQuery = await searchQueryHandler(dollarQuery);
+
+    /* Create search query without case sensitive */
+    const isearchQuery = await isearchQueryHandler(dollarQuery);
+
     /* Create where object */
     let where = {
       ...requestQuery,
@@ -83,23 +89,17 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
       ...gtOrGteQuery,
       ...ltOrLteQuery,
       ...neQuery,
+      ...searchQuery,
+      ...isearchQuery,
     };
-
-    /* Create search query with case sensitive */
-    const searchQuery = await searchQueryHandler(dollarQuery);
-    where = handleOrInWhereObject(where, searchQuery);
-
-    /* Create search query without case sensitive */
-    const isearchQuery = await isearchQueryHandler(dollarQuery);
-    where = handleOrInWhereObject(where, isearchQuery);
-
-    /* Filter OR operator */
-    const orQuery = await orQueryHandler(dollarQuery);
-    where = handleOrInWhereObject(where, orQuery);
 
     /* Make mongodb fields search query */
     const fieldSearchQuery = await searchInFieldsHandler(dollarQuery);
     where = handleOrInWhereObject(where, fieldSearchQuery);
+
+    /* Filter OR operator */
+    const orQuery = await orQueryHandler(dollarQuery);
+    where = handleOrInWhereObject(where, orQuery);
 
     /* Get limit from request query either env variable */
     if (dollarQuery.$limit) {
