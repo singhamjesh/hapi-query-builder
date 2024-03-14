@@ -43,16 +43,16 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
     /* Remove dollar query from request query */
     await removeElements(dollarQuery, requestQuery);
 
-    /* Create $in or $nin mongoose query */
+    /* Create $in or $nin mongodb query */
     const inOrNotInQuery = await inOrNotInQueryBuilder(requestQuery);
 
-    /* Create $gt(Greater then) or $gte(Greater then equal to) mongoose query */
+    /* Create $gt(Greater then) or $gte(Greater then equal to) mongodb query */
     const gtOrGteQuery = await gtOrGteQueryBuilder(requestQuery);
 
-    /* Create $lt(Less then) or $lte(Less then equal to) mongoose query */
+    /* Create $lt(Less then) or $lte(Less then equal to) mongodb query */
     const ltOrLteQuery = await ltOrLteQueryBuilder(requestQuery);
 
-    /* Create $ne(not equal to) mongoose query */
+    /* Create $ne(not equal to) mongodb query */
     const neQuery = await neQueryBuilder(requestQuery);
 
     /* Filter dollar operator form request query object */
@@ -134,7 +134,9 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
     ) {
       selectQuery = '_id';
     }
-    options = assign(options, { select: selectQuery });
+    if (selectQuery) {
+      options = assign(options, { select: selectQuery });
+    }
 
     /* Create Populate according to its value */
     let populate = dollarQuery.$populate;
@@ -142,7 +144,6 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
       populate = populate.split(',');
       options = assign(options, { populate });
     }
-
     return { where, options };
   } catch (err) {
     throw new Boom.Boom(err, { statusCode: 400 });

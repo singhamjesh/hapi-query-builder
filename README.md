@@ -1,16 +1,16 @@
 # Universal query builder for Hapi.js
 
 Hapi-query-builder is a Hapi.js plugin. It is an ambitious attempt to create a
-kind of "URL" to "Mongoose query" translator which provides a mongoose query for
+kind of "URL" to "Mongoose/mongodb query" translator which provides a mongoose/mongodb query for
 GET API. It provides facilities to the developer to pass query params in URL and
-get the mongoose query.
+get the mongoos/mongodb query.
 
 #### The primary benefits of this plugin (currently) are:
 
-- Ability to convert directory query params to mongoose get query.
-- Supports all get query command of mongoose (like- pagination and populate)
+- Ability to convert directory query params to mongoose/mongodb get query.
+- Supports all get query command of mongoose/mongodb (like- pagination and populate)
 - Automatically identify where condition and option from query params.
-- You can access mongoose query in request parameter with name "parsedQuery". It
+- You can access mongoose/mongodb query in request parameter with name "parsedQuery". It
   is object witch hold where and option keys.
 - For better experience use "mongoose-paginate-v2" npm package.
 

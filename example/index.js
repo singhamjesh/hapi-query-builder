@@ -14,7 +14,7 @@ const init = async function () {
       method: 'GET',
       path: '/query',
       handler: function (request, h) {
-        // Return the mongoose query which was requested in query params
+        // Return the mongodb query which was requested in query params
         return h
           .response({
             statusCode: 200,

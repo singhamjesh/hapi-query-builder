@@ -1,7 +1,7 @@
 {
   "name": "hapi-query-builder",
   "version": "2.0.1",
-  "description": "The hapi-query-builder hapi.js to get all query from url and create mongoose query.",
+  "description": "The hapi-query-builder hapi.js to get all query from url and create mongodb query.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,7 +12,12 @@
   },
   "keywords": [
     "hapi",
+    "hapi.js",
+    "query",
     "hapi-query",
+    "mongodb",
+    "mongodb-query",
+    "query-builder",
     "hapi-query-builder",
     "hapi-mongoose",
     "hapi-mongoose-query"
@@ -37,7 +42,7 @@
     "@hapi/boom": "^10.0.1",
     "joi": "^17.12.2",
     "lodash": "^4.17.21",
-    "mongoose": "^8.2.1"
+    "mongodb": "^6.5.0"
   },
   "devDependencies": {
     "@hapi/hapi": "^21.3.6",
