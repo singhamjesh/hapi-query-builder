@@ -127,7 +127,6 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
 
     /* Select field query, By default its undefined */
     let selectQuery = dollarQuery.$select;
-    console.log('defaultSelectField', defaultSelectField, selectQuery);
     if (
       !selectQuery &&
       defaultSelectField &&
