@@ -166,8 +166,8 @@ Passing modal with comma separated in $populate
 ### Sort
 
 Passing DB field name for shorting in $sort  
-_For Ascending pass value 1 or_  
-_For Descending pass value -1_
+_For Ascending pass value 1 or asc and_  
+_For Descending pass value -1 or desc any one_
 
 ```
 - GET       /api-path?$sort=field1|1,field2|1

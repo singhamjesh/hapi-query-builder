@@ -115,7 +115,12 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
       const sortArray = dollarQuery.$sort.split(',');
       sortArray.forEach((item) => {
         const key = item.split('|')[0];
-        sort[key] = item.split('|')[1];
+        const val = item.split('|')[1];
+        if (val === '1' || val === 'asc') {
+          sort[key] = 1;
+        } else if (val === '-1' || val === 'desc') {
+          sort[key] = -1;
+        }
       });
       options = assign(options, { sort });
     }
