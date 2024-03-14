@@ -24,8 +24,8 @@ You can add the module to your Hapi using npm:
 
 ## Compatibility
 
-node: >= 12.20.1,  
-hapi: >= 18.x.x
+node: >= 18.x.x,  
+hapi: >= 21.x.x
 
 ## Quick start
 
@@ -45,7 +45,7 @@ const Hapi = require('@hapi/hapi');
         await server.register({
             plugin: require('hapi-query-builder'),
             options: {
-                defaultLimit: 20,
+                defaultSelectField: '_id', // (optional)- Pass field name for default select if $select is empty
             },
         });
 
@@ -138,8 +138,8 @@ Passing search text with DB fields name with pip operator in $q
 Passing DB field name and search value with pip operator in $search
 
 ```
-- GET       /api-path?$search=field|value
-- Ex        /user?$search=name|Amjesh
+- GET       /api-path?$search=field|value,field1|value,....fieldn|value
+- Ex        /user?$search=name|Amjesh,email|amjesh@example.com
 - Result    {"where":{"name":{"$regex":/Amjesh/}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
@@ -148,8 +148,8 @@ Passing DB field name and search value with pip operator in $search
 Passing DB field name and search value with pip operator in $isearch
 
 ```
-- GET       /api-path?$isearch=field|value
-- Ex-       /user?$isearch=name|Amjesh
+- GET       /api-path?$isearch=field|value,field1|value,...fieldn|value
+- Ex-       /user?$isearch=name|Amjesh,email|amjesh@example.com
 - Result    {"where":{"name":{"$regex":/amjesh/,"$options":"i"}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
@@ -243,12 +243,3 @@ Get all records where the value does $ne(not equal to) match from value
 - Result    {"where":{"archive":{"$ne":true}},"options":{"lean":true,"offset":0,"limit":20,"sort":{}}}
 ```
 
-### Version
-
-You can also pass v1 and v2 for hapi-query-builder version  
-If you do not pass v1 or v2 in query params it's by default use version 1
-
-```
-* /api-path?v=value
-* Ex- /user?$v=2
-```

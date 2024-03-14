@@ -2,11 +2,11 @@ const Hapi = require('@hapi/hapi');
 
 const init = async function () {
   try {
-    const server = new Hapi.server({ port: 5001 });
+    const server = new Hapi.server({ port: 9001 });
     await server.register({
       plugin: require('../index'),
       options: {
-        defaultLimit: 20,
+        defaultSelectField: '_id',
       },
     });
     // Add a route - handler and route definition is the same for all versions

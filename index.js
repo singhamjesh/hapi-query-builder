@@ -18,7 +18,10 @@ const {
 /* Validate query builder options with given schema */
 const schema = {
   optionsSchema: Joi.object({
-    defaultLimit: Joi.number().integer().default(50),
+    defaultSelectField: Joi.string()
+      .optional()
+      .allow('_id', 'all')
+      .default('all'),
   }),
 };
 
@@ -28,16 +31,11 @@ const schema = {
  * @return {*} where object
  * @return {*} option object
  */
-const _hapiQueryBuilderHandler = async (requestQuery) => {
+const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
   try {
     /* Hack due to bug in hapi-swagger-docs */
     delete requestQuery[''];
     delete requestQuery.$count;
-
-    /* Check version and remove from query */
-    let version = requestQuery.v;
-    if (!version) version = 1;
-    delete requestQuery.v;
 
     /* Filter dollar query option in request query */
     const dollarQuery = await filterByStartsWith(requestQuery, '$');
@@ -124,7 +122,12 @@ const _hapiQueryBuilderHandler = async (requestQuery) => {
 
     /* Select field query, By default its undefined */
     let selectQuery = dollarQuery.$select;
-    if (!selectQuery && version == 2) {
+    console.log('defaultSelectField', defaultSelectField, selectQuery);
+    if (
+      !selectQuery &&
+      defaultSelectField &&
+      defaultSelectField.toLowerCase() !== 'all'
+    ) {
       selectQuery = '_id';
     }
     options = assign(options, { select: selectQuery });
@@ -168,7 +171,7 @@ exports.register = (server, options) => {
     if (request.method === 'get') {
       request.parsedQuery = await _hapiQueryBuilderHandler(
         request.query,
-        // options.defaultLimit,
+        options.defaultSelectField,
       );
     }
     return h.continue;
@@ -179,12 +182,12 @@ exports.register = (server, options) => {
  * This method trigger manually when user call
  * Its a helper method. to use this you can get query from another REST method also
  * @param {Hapi request obj} requestQuery request query object
- * @param { Number } defaultLimit default record limit
+ * @param { Number } defaultSelectField default record limit
  * @return {where, options} in object
  */
-exports.QueryMaker = async (requestQuery, defaultLimit = 100) => {
-  if (!requestQuery || !defaultLimit) {
+exports.QueryMaker = async (requestQuery, defaultSelectField = 'all') => {
+  if (!requestQuery || !defaultSelectField) {
     throw new Error('Invalid request parameters');
   }
-  return await _hapiQueryBuilderHandler(requestQuery);
+  return await _hapiQueryBuilderHandler(requestQuery, defaultSelectField);
 };
