@@ -13,6 +13,7 @@ const {
   searchQueryHandler,
   isearchQueryHandler,
   searchInFieldsHandler,
+  fullTextSearchQueryHandler,
 } = require('./lib/search');
 
 /* Validate query builder options with given schema */
@@ -94,6 +95,10 @@ const _hapiQueryBuilderHandler = async (requestQuery, defaultSelectField) => {
     /* Make mongodb fields search query */
     const fieldSearchQuery = await searchInFieldsHandler(dollarQuery);
     where = handleOrInWhereObject(where, fieldSearchQuery);
+
+    /* Make mongodb fields full search query */
+    const fullTextSearchQuery = await fullTextSearchQueryHandler(dollarQuery);
+    where = handleOrInWhereObject(where, fullTextSearchQuery);
 
     /* Filter OR operator */
     const orQuery = await orQueryHandler(dollarQuery);
